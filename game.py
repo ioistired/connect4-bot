@@ -7,7 +7,7 @@ from itertools import groupby, chain
 
 class Board(list):
 
-	def __init__(self, width, height):
+	def __init__(self, width, height, player1_name=None, player2_name=None):
 		self.width = width
 		self.height = height
 		for x in range(width):
@@ -79,22 +79,34 @@ class Connect4Game:
 		'\N{large blue circle}'
 	)
 
-	def __init__(self):
+	def __init__(self, player1_name=None, player2_name=None):
+		if player1_name is not None and player2_name is not None:
+			self.player1_name = player1_name
+			self.player2_name = player2_name
+			self.players_named = True
+		else:
+			self.players_named = False
+
 		self.board = Board(7, 6)
 		self.turn_count = 0
 
 	def move(self, x):
-		self.board[x] = self._whomst_turn()
+		self.board[x] = self.turn_count%2 + 1
 		self.turn_count += 1
 
 	def _whomst_turn(self):
-		return self.turn_count%2 + 1
+		if not self.players_named:
+			names = ['Player 1', 'Player 2']
+		else:
+			names = [self.player1_name, self.player2_name]
+
+		return names[self.turn_count%2]
 
 	def __str__(self):
 		win_status = self.whomst_won()
 
 		if win_status == self.NO_WINNER:
-			status = "Player {}'s turn".format(self._whomst_turn())
+			status = self._whomst_turn() + "'s turn"
 		elif win_status == self.TIE:
 			status = "It's a tie!"
 		else:

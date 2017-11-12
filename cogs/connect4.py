@@ -5,6 +5,8 @@
 # Using code from SourSpoon under the MIT License
 # https://github.com/SourSpoon/Discord.py-Template
 
+import asyncio
+
 import discord
 from discord.ext import commands
 
@@ -24,7 +26,7 @@ class Connect4:
 		"""
 		Play connect4 with another player
 		"""
-		game = Connect4Game()
+		game = Connect4Game(ctx.message.author.name, player2.name)
 		self.games[ctx.message.author] = game
 
 		game.message = await ctx.send(str(game))
@@ -41,10 +43,14 @@ class Connect4:
 				check=check
 			)
 
+			await asyncio.sleep(0.3)
 			await game.message.remove_reaction(reaction, user)
 
-			# convert the reaction to a 0-indexed int and move in that column
-			game.move(self.DIGITS.index(str(reaction)))
+			try:
+				# convert the reaction to a 0-indexed int and move in that column
+				game.move(self.DIGITS.index(str(reaction)))
+			except ValueError:
+				pass # the column may be full
 
 			await game.message.edit(content=str(game))
 			self.games[ctx.message.author] = game
@@ -58,7 +64,9 @@ class Connect4:
 		try:
 			await game.message.edit(
 				content='Player 2 won (Player 1 forfeited)'
-				+ '\n'.join('\n'.split(str(game))[1:]) # all lines after 1st
+				# skip the first two lines
+				# (the status line and the instruction line)
+				+ '\n'.join('\n'.split(str(game))[2:])
 			)
 			await self.delete_game(ctx.message.author)
 		except KeyError:
