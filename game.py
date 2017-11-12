@@ -3,106 +3,135 @@
 # © 2017 Benjamin Mintz <bmintz@protonmail.com>
 
 from typing import Union
+from itertools import groupby, chain
 
-class Connect4Board(list):
+class Board(list):
 
 	def __init__(self, width, height):
 		self.width = width
 		self.height = height
+		for x in range(width):
+			self.append([0] * height)
 
-		# fill the board with 0s
-		for y in range(height):
-			self.append([0] * width)
-
-	def __getitem__(self, xy):
-		x, y = xy
-		# basically self[y][x] but since this is __getitem__,
-		# that would be recursive
-		return list(self)[y][x]
+	def __getitem__(self, pos: Union[int, tuple]):
+		if isinstance(pos, int):
+			return list(self)[pos]
+		elif isinstance(pos, tuple):
+			x, y = pos
+			return list(self)[x][y]
+		else:
+			raise TypeError('pos must be an int or tuple')
 
 	def __setitem__(self, pos: Union[int, tuple], new_value):
-		"""Set self[x] or self[x,y] to new_value
-		If pos is a tuple, attempt to set board[*pos] (x, y) to new_value.
-		If pos is an int, attempt to play as player `player` at column `pos`
-
-		If that position is already filled, raise IndexError
-		"""
-
 		x, y = self._xy(pos)
 
 		if self[x, y] != 0:
-			raise IndexError('there is already a move at that position')
+			raise IndexError("there's already a move at that position")
 
-		print(type(list(self)))
-		type(list(self)[y][x]))
-		list(self)[y][x] = new_value
-
-	def __iter__(self):
-		for y in range(self.height):
-			for x in range(self.width):
-				yield x, y
+		# basically self[x][y] = new_value
+		# super().__getitem__(x).__setitem__(y, new_value)
+		self[x][y] = new_value
 
 	def _xy(self, pos):
-		if isinstance(pos, int):
+		if isinstance(pos, tuple):
+			return pos[0], pos[1]
+		elif isinstance(pos, int):
 			x = pos
-			# only a column was passed
 			return x, self._y(x)
 		else:
-			x, y = pos
-			if y < self._y(x):
-				# the given y is too damn high!
-				raise IndexError('you can only move in the lowest empty position')
-		return x, y
+			raise TypeError('pos must be an int or tuple')
 
 	def _y(self, x):
-		"""find the lowest empty position for the column indicated by x"""
-		# start from the bottom of the board and move up
-		for y in range(self.height - 1, 0, -1):
+		"""find the lowest empty row for column x"""
+		# start from the bottom and work up
+		for y in range(self.height-1, -1, -1):
 			if self[x, y] == 0:
 				return y
 		raise ValueError('that column is full')
 
+	def _pos_diagonals(self):
+		"""Get positive diagonals, going from bottom-left to top-right."""
+		for di in ([(j, i - j) for j in range(self.width)] for i in range(self.width + self.height - 1)):
+			yield [self[i, j] for i, j in di if i >= 0 and j >= 0 and i < self.width and j < self.height]
+
+	def _neg_diagonals(self):
+		"""Get negative diagonals, going from top-left to bottom-right."""
+		for di in ([(j, i - self.width + j + 1) for j in range(self.height)] for i in range(self.width + self.height - 1)):
+			yield [self[i, j] for i, j in di if i >= 0 and j >= 0 and i < self.width and j < self.height]
+
+	def _full(self):
+		"""is there a move in every position?"""
+
+		for x in range(self.width):
+			if self[x, 0] == 0:
+				return False
+		return True
+
 
 class Connect4Game:
 
+	TIE = -1
+	NO_WINNER = 0
+
+	PIECES = (
+		'\N{medium white circle}'
+		'\N{large red circle}'
+		'\N{large blue circle}'
+	)
+
 	def __init__(self):
-		self.board = Connect4Board(5, 5)
-		self._turn_count = 0
+		self.board = Board(7, 6)
+		self.turn_count = 0
 
-	def move(self, player: int, column):
-		if player not in (1, 2):
-			raise ValueError('you may only play as player 1 or 2')
-		if player != self._whose_turn():
-			raise ValueError("it's not your turn!")
-
-		self.board[column] = player
+	def move(self, x):
+		self.board[x] = self._whomst_turn()
 		self.turn_count += 1
 
+	def _whomst_turn(self):
+		return self.turn_count%2 + 1
+
 	def __str__(self):
+		win_status = self.whomst_won()
+
+		if win_status == self.NO_WINNER:
+			status = "Player {}'s turn".format(self._whomst_turn())
+		elif win_status == self.TIE:
+			status = "It's a tie!"
+		else:
+			status = 'Player {} won!'.format(win_status)
+		status = status + '\n'
+
 		return (
-			"Player {}'s turn\n".format(self._whose_turn())
+			status
 			+ '\n'.join(self._format_row(y) for y in range(self.board.height))
 		)
 
-	def _game_over(self):
-		"""Has the game ended? If so, return the player that won,
-		or 0 if no player won. If the game is not over, return False"""
-
-		board = list(self.board) # makes it easier to slice
-
-		#for x, y in self.board:
-			#if board
-
-
-	def _whose_turn(self):
-		return self._turn_count % 2 + 1
-
 	def _format_row(self, y):
-		print(y)
 		return ''.join(self[x, y] for x in range(self.board.width))
 
 	def __getitem__(self, pos):
-		pieces = '\N{medium white circle}\N{large red circle}\N{large blue circle}'
+		x, y = pos
+		return self.PIECES[self.board[x, y]]
 
-		print('game.getitem', self.board[pos])
-		return pieces[self.board[pos]]
+	def whomst_won(self):
+		"""Get the winner on the current board.
+		If there's no winner yet, return Connect4Game.NO_WINNER.
+		If it's a tie, return Connect4Game.TIE"""
+
+		lines = (
+			self.board, # columns
+			zip(*self.board), # rows (zip picks the nth item from each column)
+			self.board._pos_diagonals(), # positive diagonals
+			self.board._neg_diagonals(), # negative diagonals
+		)
+
+		for line in chain(*lines):
+			for player, group in groupby(line):
+				if player != 0 and len(list(group)) >= 4:
+					return player
+
+		if self.board._full():
+			return self.TIE
+		else:
+			return self.NO_WINNER
+
