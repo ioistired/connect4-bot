@@ -1,2 +1,6 @@
 data/config.json
 \.idea/
+__pycache__
+
+# nano swap files
+*.swp
