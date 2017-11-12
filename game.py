@@ -94,28 +94,40 @@ class Connect4Game:
 		self.board[x] = self.turn_count%2 + 1
 		self.turn_count += 1
 
-	def _whomst_turn(self):
-		if not self.players_named:
-			names = ['Player 1', 'Player 2']
-		else:
+	def _get_player_name(self, player_number):
+		player_number -= 1 # these lists are 0-indexed but the players aren't
+		if self.players_named:
 			names = [self.player1_name, self.player2_name]
+		else:
+			names = ['Player 1', 'Player 2']
 
-		return names[self.turn_count%2]
+		return names[player_number]
+
+	def _whomst_turn(self):
+		return self._get_player_name(self.turn_count%2+1)
+
+	def _get_instructions(self):
+		instructions = ''
+		for i in range(1, self.board.width+1):
+			instructions += str(i) + '\N{combining enclosing keycap}'
+		return instructions + '\n'
 
 	def __str__(self):
 		win_status = self.whomst_won()
+		instructions = ''
 
 		if win_status == self.NO_WINNER:
 			status = self._whomst_turn() + "'s turn"
+			instructions = self._get_instructions()
 		elif win_status == self.TIE:
 			status = "It's a tie!"
 		else:
-			status = 'Player {} won!'.format(win_status)
+			status = self._get_player_name(win_status) + ' won!'
 		status = status + '\n'
 
 		return (
 			status
-			+ '**' + ''.join(str(i) + '\N{combining enclosing keycap}' for i in range(1, self.board.width + 1)) + '**\n'
+			+ instructions
 			+ '\n'.join(self._format_row(y) for y in range(self.board.height))
 		)
 

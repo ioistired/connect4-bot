@@ -26,7 +26,11 @@ class Connect4:
 		"""
 		Play connect4 with another player
 		"""
-		game = Connect4Game(ctx.message.author.name, player2.name)
+		game = Connect4Game(
+			await self.get_name(ctx.message.author),
+			await self.get_name(player2)
+		)
+
 		self.games[ctx.message.author] = game
 
 		game.message = await ctx.send(str(game))
@@ -35,7 +39,10 @@ class Connect4:
 			await game.message.add_reaction(digit)
 
 		def check(reaction, user):
-			return user == ctx.message.author and str(reaction) in self.DIGITS
+			return (
+				user in (ctx.message.author, player2)
+				and str(reaction) in self.DIGITS
+			)
 
 		while game.whomst_won() == game.NO_WINNER:
 			reaction, user = await self.bot.wait_for(
@@ -68,12 +75,19 @@ class Connect4:
 				# (the status line and the instruction line)
 				+ '\n'.join('\n'.split(str(game))[2:])
 			)
+		except:
+			pass
+
+		try:
 			await self.delete_game(ctx.message.author)
 		except KeyError:
 			await ctx.send("You don't have a game to leave!")
 
 	async def delete_game(self, author):
 		del self.games[author]
+
+	async def get_name(self, member):
+		return member.nick or member.name
 
 
 def setup(bot):
