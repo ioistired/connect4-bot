@@ -115,6 +115,7 @@ class Connect4Game:
 
 		return (
 			status
+			+ '**' + ''.join(str(i) + '\N{combining enclosing keycap}' for i in range(1, self.board.width + 1)) + '**\n'
 			+ '\n'.join(self._format_row(y) for y in range(self.board.height))
 		)
 
