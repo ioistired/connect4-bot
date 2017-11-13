@@ -89,7 +89,7 @@ class Connect4Game:
 		self.turn_count = 0
 
 	def move(self, x):
-		self.board[x] = self._whomst_turn()
+		self.board[x] = self.whomst_turn()
 		self.turn_count += 1
 
 	def _get_player_name(self, player_number):
@@ -97,7 +97,7 @@ class Connect4Game:
 
 		return self.names[player_number]
 
-	def _whomst_turn(self):
+	def whomst_turn(self):
 		return self.turn_count%2+1
 
 	def _get_instructions(self):
@@ -111,7 +111,7 @@ class Connect4Game:
 		instructions = ''
 
 		if win_status == self.NO_WINNER:
-			status = self._get_player_name(self._whomst_turn()) + "'s turn"
+			status = self._get_player_name(self.whomst_turn()) + "'s turn"
 			instructions = self._get_instructions()
 		elif win_status == self.TIE:
 			status = "It's a tie!"
