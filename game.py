@@ -81,30 +81,24 @@ class Connect4Game:
 
 	def __init__(self, player1_name=None, player2_name=None):
 		if player1_name is not None and player2_name is not None:
-			self.player1_name = player1_name
-			self.player2_name = player2_name
-			self.players_named = True
+			self.names = (player1_name, player2_name)
 		else:
-			self.players_named = False
+			self.names = ('Player 1', 'Player 2')
 
 		self.board = Board(7, 6)
 		self.turn_count = 0
 
 	def move(self, x):
-		self.board[x] = self.turn_count%2 + 1
+		self.board[x] = self._whomst_turn()
 		self.turn_count += 1
 
 	def _get_player_name(self, player_number):
 		player_number -= 1 # these lists are 0-indexed but the players aren't
-		if self.players_named:
-			names = [self.player1_name, self.player2_name]
-		else:
-			names = ['Player 1', 'Player 2']
 
-		return names[player_number]
+		return self.names[player_number]
 
 	def _whomst_turn(self):
-		return self._get_player_name(self.turn_count%2+1)
+		return self.turn_count%2+1
 
 	def _get_instructions(self):
 		instructions = ''
@@ -117,7 +111,7 @@ class Connect4Game:
 		instructions = ''
 
 		if win_status == self.NO_WINNER:
-			status = self._whomst_turn() + "'s turn"
+			status = self._get_player_name(self._whomst_turn()) + "'s turn"
 			instructions = self._get_instructions()
 		elif win_status == self.TIE:
 			status = "It's a tie!"
