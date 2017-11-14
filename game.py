@@ -88,42 +88,40 @@ class Connect4Game:
 		self.board = Board(7, 6)
 		self.turn_count = 0
 
-	def move(self, x):
-		self.board[x] = self.whomst_turn()
+	def move(self, column):
+		self.board[column] = self.whomst_turn()
 		self.turn_count += 1
-
-	def _get_player_name(self, player_number):
-		player_number -= 1 # these lists are 0-indexed but the players aren't
-
-		return self.names[player_number]
-
-	def whomst_turn(self):
-		return self.turn_count%2+1
-
-	def _get_instructions(self):
-		instructions = ''
-		for i in range(1, self.board.width+1):
-			instructions += str(i) + '\N{combining enclosing keycap}'
-		return instructions + '\n'
 
 	def __str__(self):
 		win_status = self.whomst_won()
+		status = self._get_status()
 		instructions = ''
-
 		if win_status == self.NO_WINNER:
-			status = self._get_player_name(self.whomst_turn()) + "'s turn"
 			instructions = self._get_instructions()
-		elif win_status == self.TIE:
-			status = "It's a tie!"
-		else:
-			status = self._get_player_name(win_status) + ' won!'
-		status = status + '\n'
 
 		return (
 			status
 			+ instructions
 			+ '\n'.join(self._format_row(y) for y in range(self.board.height))
 		)
+
+	def _get_status(self):
+		win_status = self.whomst_won()
+
+		if win_status == self.NO_WINNER:
+			status = self._get_player_name(self.whomst_turn()) + "'s turn"
+		elif win_status == self.TIE:
+			status = "It's a tie!"
+		else:
+			status = self._get_player_name(win_status) + ' won!'
+		return status + '\n'
+
+
+	def _get_instructions(self):
+		instructions = ''
+		for i in range(1, self.board.width+1):
+			instructions += str(i) + '\N{combining enclosing keycap}'
+		return instructions + '\n'
 
 	def _format_row(self, y):
 		return ''.join(self[x, y] for x in range(self.board.width))
@@ -154,3 +152,10 @@ class Connect4Game:
 		else:
 			return self.NO_WINNER
 
+	def whomst_turn(self):
+		return self.turn_count%2+1
+
+	def _get_player_name(self, player_number):
+		player_number -= 1 # these lists are 0-indexed but the players aren't
+
+		return self.names[player_number]
