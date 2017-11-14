@@ -15,33 +15,34 @@ from game import Connect4Game
 
 class Connect4:
 
-	DIGITS = [str(digit) + '\N{combining enclosing keycap}' for digit in range(1, 8)]
+	CANCEL_GAME_EMOJI = '🚫'
+	DIGITS = [str(digit) + '\N{combining enclosing keycap}' for digit in range(1, 8)] + ['🚫']
+	VALID_REACTIONS = [CANCEL_GAME_EMOJI] + DIGITS
 
 	def __init__(self, bot):
 		self.bot = bot
-		self.games = {}
 
 	@commands.command()
 	async def play(self, ctx, player2: discord.Member):
 		"""
 		Play connect4 with another player
 		"""
+		player1 = ctx.message.author
+
 		game = Connect4Game(
-			await self.get_name(ctx.message.author),
+			await self.get_name(player1),
 			await self.get_name(player2)
 		)
 
-		self.games[ctx.message.author] = game
-
-		game.message = await ctx.send(str(game))
+		message = await ctx.send(str(game))
 
 		for digit in self.DIGITS:
-			await game.message.add_reaction(digit)
+			await message.add_reaction(digit)
 
 		def check(reaction, user):
 			return (
-				user in (ctx.message.author, player2)
-				and str(reaction) in self.DIGITS
+				user == (player1, player2)[game.whomst_turn()-1]
+				and str(reaction) in self.VALID_REACTIONS
 			)
 
 		while game.whomst_won() == game.NO_WINNER:
@@ -51,7 +52,11 @@ class Connect4:
 			)
 
 			await asyncio.sleep(0.3)
-			await game.message.remove_reaction(reaction, user)
+			await message.remove_reaction(reaction, user)
+
+			if str(reaction) == self.CANCEL_GAME_EMOJI:
+				await self.end_game(game, message)
+				return
 
 			try:
 				# convert the reaction to a 0-indexed int and move in that column
@@ -59,35 +64,33 @@ class Connect4:
 			except ValueError:
 				pass # the column may be full
 
-			await game.message.edit(content=str(game))
-			self.games[ctx.message.author] = game
+			await message.edit(content=str(game))
 
-		await game.message.clear_reactions()
-		await game.message.edit(content=str(game))
-		await self.delete_game(ctx.message.author)
+		await self.end_game(game, message)
 
-	@commands.command()
-	async def leave(self, ctx):
+	async def end_game(self, game, message):
 		try:
-			await game.message.edit(
-				content='Player 2 won (Player 1 forfeited)'
+			await message.edit(
+				content='Game over ({} forfeited)\n'
+					.format(game._get_player_name(game.whomst_turn()))
 				# skip the first two lines
 				# (the status line and the instruction line)
-				+ '\n'.join('\n'.split(str(game))[2:])
+				+ '\n'.join(str(game).split('\n')[2:])
 			)
 		except:
 			pass
 
-		try:
-			await self.delete_game(ctx.message.author)
-		except KeyError:
-			await ctx.send("You don't have a game to leave!")
+		await self.clear_reactions(message)
 
-	async def delete_game(self, author):
-		del self.games[author]
+
+	async def clear_reactions(self, message):
+		try:
+			await message.clear_reactions()
+		except:
+			pass
 
 	async def get_name(self, member):
-		return member.nick or member.name
+		return getattr(member, 'nick', member.name)
 
 
 def setup(bot):
