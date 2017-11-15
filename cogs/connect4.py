@@ -56,6 +56,7 @@ class Connect4:
 			await message.remove_reaction(reaction, user)
 
 			if str(reaction) == self.CANCEL_GAME_EMOJI:
+				game.forfeit()
 				break
 
 			try:
@@ -69,7 +70,6 @@ class Connect4:
 		await self.end_game(game, message)
 
 	async def end_game(self, game, message):
-		game.forfeit()
 		await message.edit(content=str(game))
 
 		await self.clear_reactions(message)
