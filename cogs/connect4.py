@@ -28,7 +28,6 @@ class Connect4:
 		Play connect4 with another player
 		"""
 		player1 = ctx.message.author
-		print(await self.get_name(player1), await self.get_name(player2))
 
 		game = Connect4Game(
 			await self.get_name(player1),
@@ -44,7 +43,7 @@ class Connect4:
 			return (
 				user == (player1, player2)[game.whomst_turn()-1]
 				and str(reaction) in self.VALID_REACTIONS
-				and reaction.message == message
+				and reaction.message.id == message.id
 			)
 
 		while game.whomst_won() == game.NO_WINNER:
