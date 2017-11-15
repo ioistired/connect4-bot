@@ -44,6 +44,7 @@ class Connect4:
 			return (
 				user == (player1, player2)[game.whomst_turn()-1]
 				and str(reaction) in self.VALID_REACTIONS
+				and reaction.message == message
 			)
 
 		while game.whomst_won() == game.NO_WINNER:
