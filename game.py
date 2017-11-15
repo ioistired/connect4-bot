@@ -129,7 +129,8 @@ class Connect4Game:
 		win_status = self.whomst_won()
 
 		if win_status == self.NO_WINNER:
-			status = self.whomst_turn_name() + "'s turn"
+			status = (self.whomst_turn_name() + "'s turn"
+				+ self.PIECES[self.whomst_turn()])
 		elif win_status == self.TIE:
 			status = "It's a tie!"
 		elif win_status == self.FORFEIT:

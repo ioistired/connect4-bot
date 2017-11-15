@@ -71,7 +71,6 @@ class Connect4:
 
 	async def end_game(self, game, message):
 		await message.edit(content=str(game))
-
 		await self.clear_reactions(message)
 
 	async def clear_reactions(self, message):
