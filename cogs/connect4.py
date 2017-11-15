@@ -28,6 +28,7 @@ class Connect4:
 		Play connect4 with another player
 		"""
 		player1 = ctx.message.author
+		print(await self.get_name(player1), await self.get_name(player2))
 
 		game = Connect4Game(
 			await self.get_name(player1),
@@ -55,8 +56,7 @@ class Connect4:
 			await message.remove_reaction(reaction, user)
 
 			if str(reaction) == self.CANCEL_GAME_EMOJI:
-				await self.end_game(game, message)
-				return
+				break
 
 			try:
 				# convert the reaction to a 0-indexed int and move in that column
@@ -69,19 +69,10 @@ class Connect4:
 		await self.end_game(game, message)
 
 	async def end_game(self, game, message):
-		try:
-			await message.edit(
-				content='Game over ({} forfeited)\n'
-					.format(game._get_player_name(game.whomst_turn()))
-				# skip the first two lines
-				# (the status line and the instruction line)
-				+ '\n'.join(str(game).split('\n')[2:])
-			)
-		except:
-			pass
+		game.forfeit()
+		await message.edit(content=str(game))
 
 		await self.clear_reactions(message)
-
 
 	async def clear_reactions(self, message):
 		try:
@@ -90,7 +81,10 @@ class Connect4:
 			pass
 
 	async def get_name(self, member):
-		return getattr(member, 'nick', member.name)
+		if hasattr(member, 'nick') and member.nick is not None:
+			return member.nick
+		else:
+			return member.name
 
 
 def setup(bot):

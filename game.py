@@ -70,6 +70,7 @@ class Board(list):
 
 class Connect4Game:
 
+	FORFEIT = -2
 	TIE = -1
 	NO_WINNER = 0
 
@@ -87,17 +88,36 @@ class Connect4Game:
 
 		self.board = Board(7, 6)
 		self.turn_count = 0
+		self._whomst_forfeited = 0
 
 	def move(self, column):
 		self.board[column] = self.whomst_turn()
 		self.turn_count += 1
 
+	def forfeit(self):
+		"""forfeit the game as the current player"""
+		self._whomst_forfeited = self.whomst_turn_name()
+
+	def _get_forfeit_status(self):
+		if self._whomst_forfeited:
+			status = '{} won ({} forfeited)\n'
+
+			return status.format(
+				self.other_player_name(),
+				self.whomst_turn_name()
+			)
+
+		raise ValueError('nobody has forfeited')
+
 	def __str__(self):
 		win_status = self.whomst_won()
 		status = self._get_status()
 		instructions = ''
+
 		if win_status == self.NO_WINNER:
 			instructions = self._get_instructions()
+		elif win_status == self.FORFEIT:
+			status = self._get_forfeit_status()
 
 		return (
 			status
@@ -109,13 +129,14 @@ class Connect4Game:
 		win_status = self.whomst_won()
 
 		if win_status == self.NO_WINNER:
-			status = self._get_player_name(self.whomst_turn()) + "'s turn"
+			status = self.whomst_turn_name() + "'s turn"
 		elif win_status == self.TIE:
 			status = "It's a tie!"
+		elif win_status == self.FORFEIT:
+			status = self._get_forfeit_status()
 		else:
 			status = self._get_player_name(win_status) + ' won!'
 		return status + '\n'
-
 
 	def _get_instructions(self):
 		instructions = ''
@@ -142,6 +163,9 @@ class Connect4Game:
 			self.board._neg_diagonals(), # negative diagonals
 		)
 
+		if self._whomst_forfeited:
+			return self.FORFEIT
+
 		for line in chain(*lines):
 			for player, group in groupby(line):
 				if player != 0 and len(list(group)) >= 4:
@@ -151,6 +175,15 @@ class Connect4Game:
 			return self.TIE
 		else:
 			return self.NO_WINNER
+
+	def other_player_name(self):
+		self.turn_count += 1
+		other_player_name = self.whomst_turn_name()
+		self.turn_count -= 1
+		return other_player_name
+
+	def whomst_turn_name(self):
+		return self._get_player_name(self.whomst_turn())
 
 	def whomst_turn(self):
 		return self.turn_count%2+1
