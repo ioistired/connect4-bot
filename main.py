@@ -11,6 +11,7 @@ import datetime
 import json
 import logging
 from pathlib import Path
+import traceback
 
 import discord
 from discord.ext import commands
@@ -79,7 +80,7 @@ class Bot(commands.Bot):
 			try:
 				self.load_extension('cogs.'+extension)
 			except Exception as e:
-				error = extension + '\n {0.__name__} : {0}'.format(type(e), e)
+				error = extension + '\n' + traceback.format_exc()
 				print('failed to load extension', error)
 			else:
 				print('loaded', extension)
