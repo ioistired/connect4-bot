@@ -40,6 +40,8 @@ async def run():
 
 
 class Bot(commands.Bot):
+	SEPARATOR = '─' * 20
+
 	def __init__(self, **kwargs):
 		super().__init__(
 			command_prefix=self.get_prefix_,
@@ -75,24 +77,27 @@ class Bot(commands.Bot):
 		cogs = [x.stem for x in Path('cogs').glob('*.py')]
 		for extension in cogs:
 			try:
-				self.load_extension(f'cogs.{extension}')
-				print(f'loaded {extension}')
+				self.load_extension('cogs.'+extension)
 			except Exception as e:
-				error = f'{extension}\n {type(e).__name__} : {e}'
-				print(f'failed to load extension {error}')
-			print('-' * 10)
+				error = extension + '\n {0.__name__} : {0}'.format(type(e), e)
+				print('failed to load extension', error)
+			else:
+				print('loaded', extension)
+			print(self.SEPARATOR)
 
 	async def on_ready(self):
 		"""
 		This event is called every time the bot connects or resumes connection.
 		"""
-		print('-' * 10)
+		print(self.SEPARATOR)
 		self.app_info = await self.application_info()
-		print(f'Logged in as: {self.user.name}\n'
-			  f'Using discord.py version: {discord.__version__}\n'
-			  f'Owner: {self.app_info.owner}\n'
-			  f'Template Maker: SourSpoon / Spoon#7805')
-		print('-' * 10)
+		print(
+			'Logged in as: {0.user.name}\n'.format(self)
+			+ 'Using discord.py version: {}\n'.format(discord.__version__)
+			+ 'Owner: {0.app_info.owner}\n'.format(self)
+			+ 'Template Maker: SourSpoon / Spoon#7805'
+		)
+		print(self.SEPARATOR)
 
 	async def on_message(self, message):
 		"""
