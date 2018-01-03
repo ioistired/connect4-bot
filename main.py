@@ -5,12 +5,12 @@
 # Using code from SourSpoon
 # https://github.com/SourSpoon/Discord.py-Template
 
-
 import asyncio
 import datetime
 import json
 import logging
 from pathlib import Path
+import re
 import traceback
 
 import discord
@@ -68,8 +68,9 @@ class Bot(commands.Bot):
 		I have made this a coroutine just to show that it can be done. If you needed async logic in here it can be done.
 		A good example of async logic would be retrieving a prefix from a database.
 		"""
-		prefix = ['!']
-		return commands.when_mentioned_or(*prefix)(bot, message)
+		match = re.search(r'^!c4\s+', message.content)
+		prefix = '' if match is None else match.group(0)
+		return commands.when_mentioned_or(prefix)(bot, message)
 
 	async def load_all_extensions(self):
 		await self.wait_until_ready()
