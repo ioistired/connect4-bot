@@ -23,7 +23,7 @@ class Connect4:
 		self.bot = bot
 
 	@commands.command()
-	async def play(self, ctx, player2: discord.Member):
+	async def play(self, ctx, *, player2: discord.Member):
 		"""
 		Play connect4 with another player
 		"""
