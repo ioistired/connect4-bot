@@ -99,14 +99,6 @@ class Bot(commands.Bot):
 		separator = self.SEPARATOR * max(map(len, lines))
 		print(separator, '\n'.join(lines), separator, sep='\n')
 
-	async def on_message(self, message):
-		"""
-		 This event triggers on every message received by the bot. Including one's that it sent itself
-		"""
-		if message.author.bot:
-			return	# ignore all bots
-		await self.process_commands(message)
-
 
 logging.basicConfig(level=logging.INFO)
 
