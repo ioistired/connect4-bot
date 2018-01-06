@@ -6,23 +6,20 @@ import time
 from discord.ext import commands
 
 
-def static_command(*args, **kwargs):
-	def wrapper(func):
-		return staticmethod(commands.command(*args, **kwargs)(func))
-	return wrapper
-
-
 class Misc:
 	def __init__(self, bot):
 		self.bot = bot
 
-	@static_command()
-	async def invite(context):
+	@commands.command()
+	async def invite(self, context):
+		"""Sends you the link to add Connect 4 to your server."""
 		await context.send(
 				'<https://discordapp.com/oauth2/authorize?client_id=378978711673896961&scope=bot&permissions=27712>')
 
-	@static_command()
-	async def ping(context):
+	@commands.command()
+	async def ping(self, context):
+		"""Shows you the latency between Connect 4 and Discord's servers."""
+
 		pong = '🏓 Pong! '
 		start = time.time()
 		message = await context.send(pong)
