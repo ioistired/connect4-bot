@@ -6,18 +6,22 @@ import time
 from discord.ext import commands
 
 
+def static_command(*args, **kwargs):
+	def wrapper(func):
+		return staticmethod(commands.command(*args, **kwargs)(func))
+	return wrapper
+
+
 class Misc:
 	def __init__(self, bot):
 		self.bot = bot
 
-	@staticmethod
-	@commands.command()
+	@static_command()
 	async def invite(context):
 		await context.send(
 				'<https://discordapp.com/oauth2/authorize?client_id=378978711673896961&scope=bot&permissions=27712>')
 
-	@staticmethod
-	@commands.command()
+	@static_command()
 	async def ping(context):
 		pong = '🏓 Pong! '
 		start = time.time()
