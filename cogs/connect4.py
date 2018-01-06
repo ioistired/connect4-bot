@@ -69,17 +69,20 @@ class Connect4:
 
 		await self.end_game(game, message)
 
-	async def end_game(self, game, message):
+	@classmethod
+	async def end_game(cls, game, message):
 		await message.edit(content=str(game))
-		await self.clear_reactions(message)
+		await cls.clear_reactions(message)
 
-	async def clear_reactions(self, message):
+	@staticmethod
+	async def clear_reactions(message):
 		try:
 			await message.clear_reactions()
 		except:
 			pass
 
-	async def get_name(self, member):
+	@staticmethod
+	async def get_name(member):
 		if hasattr(member, 'nick') and member.nick is not None:
 			return member.nick
 		else:
