@@ -53,7 +53,10 @@ class Connect4:
 			)
 
 			await asyncio.sleep(0.3)
-			await message.remove_reaction(reaction, user)
+			try:
+				await message.remove_reaction(reaction, user)
+			except discord.errors.Forbidden:
+				await self.wait_for_digit_removal(reaction.emoji, user, message)
 
 			if str(reaction) == self.CANCEL_GAME_EMOJI:
 				game.forfeit()
@@ -68,6 +71,16 @@ class Connect4:
 			await message.edit(content=str(game))
 
 		await self.end_game(game, message)
+
+	async def wait_for_digit_removal(self, emote: str, player, message):
+		"""wait for the user to remove the reaction given by emote on the given message"""
+		def check(reaction, user):
+			return (
+				str(reaction) in self.VALID_REACTIONS
+				and str(reaction) == emote
+				and player == user
+				and reaction.message.id == message.id)
+		await self.bot.wait_for('reaction_remove')
 
 	@classmethod
 	async def end_game(cls, game, message):
