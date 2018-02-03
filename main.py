@@ -9,7 +9,6 @@ import asyncio
 import datetime
 import json
 import logging
-from pathlib import Path
 import re
 import traceback
 
@@ -75,7 +74,7 @@ class Bot(commands.Bot):
 	async def load_all_extensions(self):
 		await self.wait_until_ready()
 		await asyncio.sleep(1)	# ensure that on_ready has completed and finished printing
-		for extension in (x.stem for x in Path('cogs').glob('*.py')):
+		for extension in ('connect4', 'meta', 'external.admin', 'external.misc', 'external.stats'):
 			try:
 				self.load_extension('cogs.'+extension)
 			except Exception as e:

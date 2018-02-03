@@ -1,0 +1,26 @@
+#!/usr/bin/env python3
+# encoding: utf-8
+
+import discord
+from discord.ext import commands
+
+
+class Meta:
+	def __init__(self, bot):
+		self.bot = bot
+
+	@commands.command()
+	async def invite(self, context):
+		"""Sends you the link to add Connect 4 to your server."""
+		permission_names = (
+			'read_messages',
+			'send_messages',
+			'manage_messages',
+			'add_reactions',
+			'embed_links')
+		permissions = discord.Permissions()
+		permissions.update(**dict.fromkeys(permission_names, True))
+		await context.send('<%s>' % discord.utils.oauth_url(self.bot.client_id, permissions))
+
+def setup(bot):
+	bot.add_cog(Meta(bot))
