@@ -90,6 +90,7 @@ class Bot(commands.Bot):
 		This event is called every time the bot connects or resumes connection.
 		"""
 		self.app_info = await self.application_info()
+		self.client_id = self.app_info.id
 		lines = (
 			'Logged in as: {0.user}'.format(self),
 			'Using discord.py version: {}'.format(discord.__version__),
