@@ -47,6 +47,8 @@ class Bot(commands.Bot):
 		super().__init__(
 			command_prefix=self.get_prefix_,
 			description=kwargs.pop('description'))
+		self.config = kwargs.pop('config')
+
 		self.start_time = None
 		self.app_info = None
 
