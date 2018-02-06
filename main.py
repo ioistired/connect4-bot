@@ -41,6 +41,7 @@ async def run():
 
 class Bot(commands.Bot):
 	SEPARATOR = '━'
+	cogs_path = 'cogs'
 
 	def __init__(self, **kwargs):
 		super().__init__(
@@ -76,7 +77,7 @@ class Bot(commands.Bot):
 		await asyncio.sleep(1)	# ensure that on_ready has completed and finished printing
 		for extension in ('connect4', 'meta', 'external.admin', 'external.misc', 'external.stats'):
 			try:
-				self.load_extension('cogs.'+extension)
+				self.load_extension(self.cogs_path + '.' + extension)
 			except Exception as e:
 				error = extension + '\n' + traceback.format_exc()
 				message = 'failed to load extension ' + error
