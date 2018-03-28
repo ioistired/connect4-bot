@@ -1,0 +1,11 @@
+{
+	"copyright_license_file": "data/license-link",
+
+	"tokens": {
+		"discord": "se.krit.token",
+
+		"stats": {
+			"bots.discord.pw": null,
+			"discordbots.org": null}},
+
+	"description": "Lets you play Connect 4 with your friends"}
