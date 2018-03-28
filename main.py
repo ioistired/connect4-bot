@@ -41,7 +41,6 @@ async def run():
 
 class Bot(commands.Bot):
 	SEPARATOR = '━'
-	cogs_path = 'cogs'
 
 	def __init__(self, **kwargs):
 		super().__init__(
@@ -77,16 +76,21 @@ class Bot(commands.Bot):
 	async def load_all_extensions(self):
 		await self.wait_until_ready()
 		await asyncio.sleep(1)	# ensure that on_ready has completed and finished printing
-		for extension in ('connect4', 'meta', 'external.admin', 'external.misc', 'external.stats'):
+		for extension in (
+				'cogs.connect4',
+				'cogs.meta',
+				'cogs.external.admin',
+				'cogs.external.misc',
+				'cogs.external.stats',
+				'jishaku'):
 			try:
-				self.load_extension(self.cogs_path + '.' + extension)
-			except Exception as e:
+				self.load_extension(extension)
+			except:
 				error = extension + '\n' + traceback.format_exc()
 				message = 'failed to load extension ' + error
 			else:
 				message = 'loaded ' + str(extension)
-			separator = self.SEPARATOR * len(message)
-			print(separator, message, separator, sep='\n')
+			print(message)
 
 	async def on_ready(self):
 		"""
