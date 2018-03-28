@@ -1,0 +1,5 @@
+aiofiles
+aiohttp
+git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py
+humanize
+jishaku>0.1.1
