@@ -79,9 +79,9 @@ class Bot(commands.Bot):
 		for extension in (
 				'cogs.connect4',
 				'cogs.meta',
-				'cogs.external.admin',
-				'cogs.external.misc',
-				'cogs.external.stats',
+				'ben_cogs.admin',
+				'ben_cogs.misc',
+				'ben_cogs.stats',
 				'jishaku'):
 			try:
 				self.load_extension(extension)
