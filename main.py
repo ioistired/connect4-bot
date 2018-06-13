@@ -45,7 +45,8 @@ class Bot(commands.Bot):
 	def __init__(self, **kwargs):
 		super().__init__(
 			command_prefix=self.get_prefix_,
-			description=kwargs.pop('description'))
+			description=kwargs.pop('description'),
+			activity=discord.Game(name='!c4 help'))
 		self.config = kwargs.pop('config')
 
 		self.start_time = None
