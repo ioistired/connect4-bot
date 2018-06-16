@@ -39,7 +39,7 @@ async def run():
 		await bot.logout()
 
 
-class Bot(commands.Bot):
+class Bot(commands.AutoShardedBot):
 	SEPARATOR = '━'
 
 	def __init__(self, **kwargs):
