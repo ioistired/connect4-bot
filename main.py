@@ -48,12 +48,25 @@ class Bot(commands.AutoShardedBot):
 			description=kwargs.pop('description'),
 			activity=discord.Game(name='!c4 help'))
 		self.config = kwargs.pop('config')
+		self.development_mode = self.config.get('release') == 'development'
+		self.add_check(self.should_reply, call_once=True)
 
 		self.start_time = None
 		self.app_info = None
 
 		self.loop.create_task(self.track_start())
 		self.loop.create_task(self.load_all_extensions())
+
+
+	async def should_reply(self, context):
+		author = context.message.author
+
+		if author == self.user:
+			return False
+		if not self.development_mode and author.bot:
+			return False
+
+		return True
 
 	async def track_start(self):
 		"""
@@ -72,7 +85,12 @@ class Bot(commands.AutoShardedBot):
 		"""
 		match = re.search(r'^!c4\s+', message.content)
 		prefix = '' if match is None else match.group(0)
-		return commands.when_mentioned_or(prefix)(bot, message)
+
+		if match:
+			prefix = match.group(0)
+			return commands.when_mentioned_or(prefix)(bot, message)
+		else:
+			return commands.when_mentioned(bot, message)
 
 	async def load_all_extensions(self):
 		await self.wait_until_ready()
@@ -112,3 +130,4 @@ logging.basicConfig(level=logging.INFO)
 
 loop = asyncio.get_event_loop()
 loop.run_until_complete(run())
+loop.close()
