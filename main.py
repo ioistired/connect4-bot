@@ -46,7 +46,7 @@ class Bot(commands.AutoShardedBot):
 		super().__init__(
 			command_prefix=self.get_prefix_,
 			description=kwargs.pop('description'),
-			activity=discord.Game(name='!c4 help'))
+			activity=discord.Game(name=f"{config['prefix']} help | shutting down in 1 week 👋")
 		self.config = kwargs.pop('config')
 		self.development_mode = self.config.get('release') == 'development'
 		self.add_check(self.should_reply, call_once=True)
@@ -98,9 +98,9 @@ class Bot(commands.AutoShardedBot):
 		for extension in (
 				'cogs.connect4',
 				'cogs.meta',
-				'ben_cogs.admin',
 				'ben_cogs.misc',
 				'ben_cogs.stats',
+				'ben_cogs.debug',
 				'jishaku'):
 			try:
 				self.load_extension(extension)

@@ -14,10 +14,10 @@ from game import Connect4Game
 
 
 class Connect4:
-
 	CANCEL_GAME_EMOJI = '🚫'
 	DIGITS = [str(digit) + '\N{combining enclosing keycap}' for digit in range(1, 8)] + ['🚫']
 	VALID_REACTIONS = [CANCEL_GAME_EMOJI] + DIGITS
+	GAME_TIMEOUT_THRESHOLD = 60
 
 	def __init__(self, bot):
 		self.bot = bot
@@ -30,8 +30,8 @@ class Connect4:
 		player1 = ctx.message.author
 
 		game = Connect4Game(
-			await self.get_name(player1),
-			await self.get_name(player2)
+			player1.display_name,
+			player2.display_name
 		)
 
 		message = await ctx.send(str(game))
@@ -47,12 +47,17 @@ class Connect4:
 			)
 
 		while game.whomst_won() == game.NO_WINNER:
-			reaction, user = await self.bot.wait_for(
-				'reaction_add',
-				check=check
-			)
+			try:
+				reaction, user = await self.bot.wait_for(
+					'reaction_add',
+					check=check,
+					timeout=self.GAME_TIMEOUT_THRESHOLD
+				)
+			except asyncio.TimeoutError:
+				game.forfeit()
+				break
 
-			await asyncio.sleep(0.3)
+			await asyncio.sleep(0.2)
 			try:
 				await message.remove_reaction(reaction, user)
 			except discord.errors.Forbidden:
@@ -91,15 +96,8 @@ class Connect4:
 	async def clear_reactions(message):
 		try:
 			await message.clear_reactions()
-		except:
+		except discord.HTTPException:
 			pass
-
-	@staticmethod
-	async def get_name(member):
-		if hasattr(member, 'nick') and member.nick is not None:
-			return member.nick
-		else:
-			return member.name
 
 
 def setup(bot):

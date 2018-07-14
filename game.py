@@ -6,6 +6,7 @@ from typing import Union
 from itertools import groupby, chain
 
 class Board(list):
+	__slots__ = frozenset({'width', 'height'})
 
 	def __init__(self, width, height, player1_name=None, player2_name=None):
 		self.width = width
@@ -69,6 +70,7 @@ class Board(list):
 
 
 class Connect4Game:
+	__slots__ = frozenset({'board', 'turn_count', '_whomst_forfeited', 'names'})
 
 	FORFEIT = -2
 	TIE = -1
