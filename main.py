@@ -46,7 +46,7 @@ class Bot(commands.AutoShardedBot):
 		super().__init__(
 			command_prefix=self.get_prefix_,
 			description=kwargs.pop('description'),
-			activity=discord.Game(name=f"{config['prefix']} help | shutting down in 1 week 👋")
+			activity=discord.Game(name='!c4 help | shutting down on July 27')
 		self.config = kwargs.pop('config')
 		self.development_mode = self.config.get('release') == 'development'
 		self.add_check(self.should_reply, call_once=True)

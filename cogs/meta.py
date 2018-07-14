@@ -8,19 +8,19 @@ from discord.ext import commands
 class Meta:
 	def __init__(self, bot):
 		self.bot = bot
+		self.bot.loop.create_task(self._init())
+
+	async def _init(self):
+		app_info = await self.bot.application_info()
+		self.bot.owner = app_info.owner
 
 	@commands.command()
 	async def invite(self, context):
 		"""Sends you the link to add Connect 4 to your server."""
-		permission_names = (
-			'read_messages',
-			'send_messages',
-			'manage_messages',
-			'add_reactions',
-			'embed_links')
-		permissions = discord.Permissions()
-		permissions.update(**dict.fromkeys(permission_names, True))
-		await context.send('<%s>' % discord.utils.oauth_url(self.bot.client_id, permissions))
+		await context.send(
+			f'Sorry, this bot is no longer public. It will shut down on July 27.\n'
+			f'Please contact @{self.bot.owner} for more information and alternative bots.')
+
 
 def setup(bot):
 	bot.add_cog(Meta(bot))
