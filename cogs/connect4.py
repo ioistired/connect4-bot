@@ -76,7 +76,7 @@ class Connect4:
 			await message.edit(content=str(game))
 
 		await self.end_game(game, message)
-		await context.send(
+		await ctx.send(
 			f'Thanks for playing! Just so you know, this bot will be shutting down on **2018-07-27**.\n'
 			f'In the meantime, the creator of this bot, @{self.bot.owner} would be happy to discuss alternative bots with you.\n'
 			f'Thanks for the memories! 👋')
