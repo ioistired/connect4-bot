@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 # © 2017 Benjamin Mintz <bmintz@protonmail.com>
-#
+# MIT Licensed
 # Using code from SourSpoon under the MIT License
 # https://github.com/SourSpoon/Discord.py-Template
 

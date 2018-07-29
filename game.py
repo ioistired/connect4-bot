@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # encoding: utf-8
 # © 2017 Benjamin Mintz <bmintz@protonmail.com>
+# MIT Licensed
 
 from typing import Union
 from itertools import groupby, chain
